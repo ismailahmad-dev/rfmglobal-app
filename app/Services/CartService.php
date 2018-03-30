@@ -10,11 +10,12 @@ class CartService
     {
         $cart = session()->get('cart', []);
 
-        $cart[$product->id]['qty'] =
-            ($cart[$product->id]['qty'] ?? 0) + 1;
-
-        $cart[$product->id]['price'] = $product->price;
-        $cart[$product->id]['name']  = $product->name;
+        $cart[$product->id] = [
+            'product_id' => $product->id,
+            'name'       => $product->name,
+            'price'      => $product->price,
+            'qty'        => ($cart[$product->id]['qty'] ?? 0) + 1,
+        ];
 
         session(['cart' => $cart]);
     }

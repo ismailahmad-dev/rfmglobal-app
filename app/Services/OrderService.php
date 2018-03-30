@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Repositories\Contracts\OrderRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class OrderService
@@ -15,18 +17,29 @@ class OrderService
 
     public function create(array $data): Order
     {
-        $order = $this->orders->create([
-            'order_no'      => Str::uuid(),
-            'customer_name' => $data['name'],
-            'email'         => $data['email'],
-            'phone'         => $data['phone'],
-            'address'       => $data['address'],
-            'total'         => $this->cart->total(),
-            'status'        => 'pending',
-        ]);
+        return DB::transaction(function () use ($data) {
 
-        $this->cart->clear();
+            $order = $this->orders->create([
+                'order_no'      => Str::uuid(),
+                'customer_name' => $data['name'],
+                'email'         => $data['email'],
+                'phone'         => $data['phone'],
+                'address'       => $data['address'],
+                'total'         => $this->cart->total(),
+                'status'        => 'pending',
+            ]);
 
-        return $order;
+            foreach ($this->cart->items() as $item) {
+                $order->items()->create([
+                    'product_id' => $item['product_id'],
+                    'price'      => $item['price'],
+                    'quantity'   => $item['qty'],
+                ]);
+            }
+
+            $this->cart->clear();
+
+            return $order;
+        });
     }
 }
