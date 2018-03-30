@@ -2,25 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\Models\Product;
+use App\Services\CartService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class CartController extends Controller
 {
-    public function add($id)
+    public function __construct(
+        protected CartService $cart
+    ) {}
+
+    public function add(int $id): RedirectResponse
     {
-        $cart = session()->get('cart', []);
-        $cart[$id]['qty'] = ($cart[$id]['qty'] ?? 0) + 1;
-        session(['cart' => $cart]);
+        $product = Product::findOrFail($id);
+        $this->cart->add($product);
 
         return redirect()->route('cart');
     }
 
-    public function index()
+    public function index(): View
     {
-        $cart = session('cart', []);
-        $products = Product::findMany(array_keys($cart));
-        return view('pages.cart', compact('products','cart'));
+        return view('pages.cart', [
+            'cart' => $this->cart->items(),
+        ]);
     }
 }

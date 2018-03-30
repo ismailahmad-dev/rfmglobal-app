@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Models\Product;
+use App\Repositories\Contracts\ProductRepositoryInterface;
+use Illuminate\View\View;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function __construct(
+        protected ProductRepositoryInterface $products
+    ) {}
+
+    public function index(): View
     {
-        $products = Product::where('is_active', true)->get();
-        return view('pages.home', compact('products'));
+        return view('pages.home', [
+            'products' => $this->products->getActive(),
+        ]);
     }
 }
