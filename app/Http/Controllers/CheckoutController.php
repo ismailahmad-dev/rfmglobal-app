@@ -20,8 +20,15 @@ class CheckoutController extends Controller
 
     public function store(StoreCheckoutRequest $request): RedirectResponse
     {
-        $this->orders->create($request->validated());
+        $order = $this->orders->create($request->validated());
 
-        return redirect()->route('success');
+        return redirect()->route('success', $order->order_no);
+    }
+    
+    public function success(string $order_no): View
+    {
+        $order = Order::where('order_no', $order_no)->with('items')->firstOrFail();
+
+        return view('pages.success', compact('order'));
     }
 }
