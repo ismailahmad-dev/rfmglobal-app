@@ -1,13 +1,21 @@
 @extends('layouts.app')
 
-@section('title','Home')
-
 @section('content')
-@foreach($products as $product)
-<form method="POST" action="{{ route('cart.add',$product->id) }}">
-@csrf
-{{ $product->name }} - RM {{ $product->price }}
-<button>Add</button>
-</form>
-@endforeach
+
+<h1>Products</h1>
+
+@forelse($products as $product)
+    <div>
+        <strong>{{ $product->name }}</strong><br>
+        RM {{ number_format($product->price, 2) }}
+
+        <form method="POST" action="{{ route('cart.add', $product->id) }}">
+            @csrf
+            <button type="submit">Add to Cart</button>
+        </form>
+    </div>
+@empty
+    <p>No products found.</p>
+@endforelse
+
 @endsection
