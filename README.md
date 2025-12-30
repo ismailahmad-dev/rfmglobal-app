@@ -37,3 +37,18 @@ This background section sets the tone for the brand and highlights RFM Global’
 
 ## 📁 Project Structure
 
+rfmglobal/
+├── app/
+├── bootstrap/
+├── config/
+├── database/
+├── public/
+├── resources/
+│ ├── views/
+│ ├── css/
+│ └── js/
+├── routes/
+├── storage/
+├── .env
+├── artisan
+└── composer.json
